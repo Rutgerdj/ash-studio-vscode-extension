@@ -15,6 +15,7 @@ import { ModuleMatcherService } from "./moduleMatcherService";
 import { DefinitionEntryService } from "./definitionEntryService";
 import { SectionParser } from "./sectionParser";
 import { DiagramCodeLensService } from "./diagramCodeLensService";
+import { ConfigurationManager } from "../utils/config";
 
 /**
  * A Parser implementation that uses ModuleConfiguration configurations
@@ -53,10 +54,17 @@ export class ModuleParser implements Parser {
         definitionEntries: [],
       };
     }
+
+    // Get alternative declaration patterns from configuration
+    const alternativePatterns = ConfigurationManager.getInstance().get(
+      "alternativeDeclarationPatterns"
+    );
+
     // Identify which modules are present
     const matchedModules = this.moduleMatcherService.identifyConfiguredModules(
       useDeclarations,
-      availableConfigs
+      availableConfigs,
+      alternativePatterns
     );
     if (matchedModules.length === 0) {
       return {

@@ -89,6 +89,16 @@
           "type": "boolean",
           "default": false,
           "description": "Adds the children of the dsl sections to the Outline and Symbols views"
+        },
+        "ashStudio.alternativeDeclarationPatterns": {
+          "type": "object",
+          "default": {},
+          "description": "Map alternative use declaration patterns to standard Ash patterns. For example: { \"App.Resource\": \"Ash.Resource\", \"App.Domain\": \"Ash.Domain\" } allows the extension to recognize custom macros that wrap Ash modules.",
+          "patternProperties": {
+            ".*": {
+              "type": "string"
+            }
+          }
         }
       }
     }
