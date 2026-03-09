@@ -32,7 +32,17 @@ export class Location {
   ) {}
 }
 
-export const workspace = {};  
+export const workspace = {
+  getConfiguration: () => ({
+    get: (key: string, defaultValue?: unknown) => {
+      // Return default values for known configuration keys
+      if (key === "alternativeDeclarationPatterns") {
+        return defaultValue ?? {};
+      }
+      return defaultValue;
+    },
+  }),
+};
 
 export const window = {
   showInformationMessage: () => {},

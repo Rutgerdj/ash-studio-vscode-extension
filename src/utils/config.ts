@@ -29,6 +29,11 @@ export class ConfigurationManager {
         return config.get("logLevel", LogLevel.INFO) as AshStudioConfig[T];
       case "enableCodeLens":
         return config.get("enableCodeLens", false) as AshStudioConfig[T];
+      case "alternativeDeclarationPatterns":
+        return config.get(
+          "alternativeDeclarationPatterns",
+          {}
+        ) as AshStudioConfig[T];
       default:
         throw new Error(`Unknown configuration key: ${key}`);
     }
@@ -58,6 +63,9 @@ export class ConfigurationManager {
     return {
       logLevel: this.get("logLevel"),
       enableCodeLens: this.get("enableCodeLens"),
+      alternativeDeclarationPatterns: this.get(
+        "alternativeDeclarationPatterns"
+      ),
     };
   }
 }
