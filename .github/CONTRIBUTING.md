@@ -9,7 +9,7 @@
 - Document module boundaries and APIs.
 - Maintain and expand tests for pure logic modules.
 - Keep documentation up to date after significant changes.
-- Build and test after every change (`npm test`).
+- Build and test after every change (`pnpm test`).
 
 ## Commenting and Documentation Guidance
 

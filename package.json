@@ -99,14 +99,14 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "type-check": "tsc --noEmit",
-    "quality": "npm run clean && npm run type-check && npm run lint && npm run format && npm test",
+    "quality": "pnpm run clean && pnpm run type-check && pnpm run lint && pnpm run format && pnpm test",
     "clean": "rm -rf dist",
-    "build": "npm run clean && tsc && npm run copy-templates",
+    "build": "pnpm run clean && tsc && pnpm run copy-templates",
     "copy-templates": "mkdir -p dist/src/vscode/ui/templates && cp -R src/vscode/ui/templates/* dist/src/vscode/ui/templates/",
     "verify-media": "node scripts/verify-media.js",
-    "pre-commit": "rm -f test-*.js crash-*.js *.tmp *.temp && npm run quality",
+    "pre-commit": "rm -f test-*.js crash-*.js *.tmp *.temp && pnpm run quality",
     "copy-test-example_files": "mkdir -p dist/test/example_files && cp -R test/example_files/* dist/test/example_files/",
-    "test": "npm run build && npm run copy-test-example_files && jest --coverage"
+    "test": "pnpm run build && pnpm run copy-test-example_files && jest --coverage"
   },
   "devDependencies": {
     "@jest/globals": "^30.0.0",
@@ -126,8 +126,5 @@
     "ts-jest": "^29.4.1",
     "typescript": "^5.8.3"
   },
-  "overrides": {
-    "glob@>=9.0.0 <14.0.2": "^14.0.6",
-    "minimatch@>=7.0.0 <11.0.1": "^11.0.9"
-  }
+  "packageManager": "pnpm@12.9.0"
 }

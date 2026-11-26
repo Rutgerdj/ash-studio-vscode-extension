@@ -4,3 +4,4 @@ dist/
 .vscode-test/
 *.min.js
 src/nearley/ashGrammar.js
+pnpm-lock.yaml

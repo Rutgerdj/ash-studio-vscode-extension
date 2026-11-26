@@ -46,7 +46,7 @@ This extension enhances VS Code for Ash Framework (Elixir) development. It provi
 ## Development Workflow
 
 - **Build & Test:**
-  - Run `npm run build`, then `npx knip`, and `npm test` after changes.
+  - Run `pnpm run build`, then `pnpm exec knip`, and `pnpm test` after changes.
   - All logic modules must have/expand unit tests.
   - Fix all errors/warnings before proceeding.
 
