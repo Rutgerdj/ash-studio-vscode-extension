@@ -34,14 +34,14 @@ Goal: Establish a dedicated release branch to isolate and track changes for the 
 Goal: Verify that the codebase meets all quality standards and passes required checks before
 release.
 
-- [ ] Project builds successfully (`npm run build`). Note: `npm run build` runs the TypeScript
+- [ ] Project builds successfully (`pnpm run build`). Note: `pnpm run build` runs the TypeScript
       compile and copies media/templates; it should complete without errors.
 - [ ] Verify media assets (scripts/verify-media.js) — ensure embedded/packaged media files are
       present.
-- [ ] No knip findings reported (`npx knip`) — run this after build to detect unused/unlisted
+- [ ] No knip findings reported (`pnpm exec knip`) — run this after build to detect unused/unlisted
       dependencies.
 - [ ] [human] Fix all knip findings before proceeding
-- [ ] All tests pass (`npm test`) — tests will run build as part of their pipeline; run after
+- [ ] All tests pass (`pnpm test`) — tests will run build as part of their pipeline; run after
       build/knip verification.
 
 ## Public documentation
@@ -67,10 +67,10 @@ Goal: Confirm that all AI-related instructions and documentation are up-to-date 
 Goal: Update version numbers to reflect the new release and maintain proper version history.
 
 - [ ] Commit all changes
-- [ ] Run `npm version patch` (or `npm version x.y.z`) to update the version number (creates a
+- [ ] Run `pnpm version patch` (or `pnpm version x.y.z`) to update the version number (creates a
       commit and tag by default)
-- [ ] Commit all changes (the only changes should be package.json and package-lock.json if using
-      `npm version --no-git-tag-version`)
+- [ ] Commit all changes (the only changes should be package.json if using
+      `pnpm version --no-git-tag-version`)
 
 ## Finalization
 
