@@ -3,6 +3,8 @@
 test/**
 .gitignore
 .yarnrc
+pnpm-lock.yaml
+pnpm-workspace.yaml
 vsc-extension-quickstart.md
 **/jsconfig.json
 **/*.map
