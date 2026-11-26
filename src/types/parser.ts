@@ -63,14 +63,38 @@ export interface ParseResult {
   definitionEntries: DefinitionEntry[]; // definition locations for Go to Definition (default: [])
 }
 
+/**
+ * Maps an alternative `use` module (e.g. a base resource macro such as
+ * "App.Resource") to one or more standard declaration patterns
+ * (e.g. "Ash.Resource" or ["Ash.Resource", "AshPostgres.DataLayer"]).
+ * This is the shape of the `ashStudio.alternativeDeclarationPatterns` setting.
+ */
+export type AlternativeDeclarationPatterns = Record<string, string | string[]>;
+
+/**
+ * Cleaned-up form of AlternativeDeclarationPatterns: every key is non-empty and
+ * maps to a non-empty list of non-empty standard declaration patterns.
+ */
+export type NormalizedAlternativeDeclarationPatterns = Record<string, string[]>;
+
+export interface ParseOptions {
+  /**
+   * Alternative declaration patterns to recognise in addition to the standard ones.
+   * The value usually comes straight from user settings, so it is normalised
+   * before use and invalid entries are ignored.
+   */
+  alternativeDeclarationPatterns?: AlternativeDeclarationPatterns;
+}
+
 export interface Parser {
   /**
    * Parse Ash DSL content from raw text
    * @param source - The source code to parse
    * @param filePath - The file path of the document (required for diagram CodeLenses)
+   * @param options - Optional parse options (e.g. alternative declaration patterns)
    * @returns ParseResult with sections, details, and any errors
    */
-  parse(source: string, filePath?: string): ParseResult;
+  parse(source: string, filePath?: string, options?: ParseOptions): ParseResult;
 }
 
 export interface CodeLensService {

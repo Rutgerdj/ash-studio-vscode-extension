@@ -74,11 +74,30 @@ export function activate(context: vscode.ExtensionContext) {
       }
     };
 
+    const onConfigurationChanged = (event: vscode.ConfigurationChangeEvent) => {
+      if (
+        event.affectsConfiguration("ashStudio.alternativeDeclarationPatterns")
+      ) {
+        // Parse results depend on this setting, so drop every cached result
+        // and re-parse the open Elixir documents with the new patterns
+        parserService.clearAllCaches();
+        vscode.workspace.textDocuments.forEach(document => {
+          if (document.languageId === "elixir") {
+            parserService.documentActivated(document);
+          }
+        });
+        // The sidebar only re-queries parse results when told to refresh.
+        // CodeLens refreshes via its own configuration listener.
+        sidebarProvider.refresh();
+      }
+    };
+
     context.subscriptions.push(
       vscode.window.onDidChangeActiveTextEditor(onActiveEditorChanged),
       vscode.workspace.onDidChangeTextDocument(onDocumentChanged),
       vscode.workspace.onDidSaveTextDocument(onDocumentSaved),
-      vscode.workspace.onDidOpenTextDocument(onDocumentOpened)
+      vscode.workspace.onDidOpenTextDocument(onDocumentOpened),
+      vscode.workspace.onDidChangeConfiguration(onConfigurationChanged)
     );
 
     // Trigger parsing for the currently active editor on startup

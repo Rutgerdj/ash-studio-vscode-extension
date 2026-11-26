@@ -1,4 +1,6 @@
 import { ModuleConfiguration } from "../types/configurationRegistry";
+import { AlternativeDeclarationPatterns } from "../types/parser";
+import { normalizeAlternativeDeclarationPatterns } from "./alternativeDeclarationPatterns";
 
 /**
  * Service for identifying which ModuleConfiguration configurations are present in use declarations.
@@ -9,16 +11,28 @@ export class ModuleMatcherService {
    *
    * @param useDeclarations Array of use declaration strings found in the file
    * @param availableConfigs Available module configurations to match against
-   * @param alternativePatterns Optional mapping of alternative patterns to standard patterns
-   *                            e.g., { "App.Resource": "Ash.Resource", "App.Domain": "Ash.Domain" }
+   * @param alternativePatterns Optional mapping of alternative patterns to one or more standard patterns
+   *                            e.g., { "App.Resource": ["Ash.Resource", "AshPostgres.DataLayer"], "App.Domain": "Ash.Domain" }
+   *                            Invalid entries are ignored.
    */
   identifyConfiguredModules(
     useDeclarations: string[],
     availableConfigs: ModuleConfiguration[],
-
-    alternativePatterns: Record<string, string> = {}
+    alternativePatterns: AlternativeDeclarationPatterns = {}
   ): ModuleConfiguration[] {
     const matchedConfigs: ModuleConfiguration[] = [];
+
+    // Precompute standard pattern -> alternative patterns that map to it
+    const alternativesByStandard = new Map<string, string[]>();
+    for (const [altPattern, standardPatterns] of Object.entries(
+      normalizeAlternativeDeclarationPatterns(alternativePatterns)
+    )) {
+      for (const standardPattern of standardPatterns) {
+        const alternatives = alternativesByStandard.get(standardPattern) ?? [];
+        alternatives.push(altPattern);
+        alternativesByStandard.set(standardPattern, alternatives);
+      }
+    }
 
     for (const useDeclaration of useDeclarations) {
       for (const config of availableConfigs) {
@@ -28,11 +42,9 @@ export class ModuleMatcherService {
         );
 
         // Check if declaration matches any configured alternative pattern
-        const matchesAlternative = Object.entries(alternativePatterns).some(
-          ([altPattern, standardPattern]) =>
-            standardPattern === config.declarationPattern &&
-            useDeclaration.includes(altPattern)
-        );
+        const matchesAlternative = (
+          alternativesByStandard.get(config.declarationPattern) ?? []
+        ).some(altPattern => useDeclaration.includes(altPattern));
 
         if (matchesStandard || matchesAlternative) {
           // Only add if not already in the list

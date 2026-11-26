@@ -8,14 +8,13 @@
  * Usage: Use the exported singleton `moduleParser` for all parsing tasks.
  */
 
-import { Parser, ParseResult } from "../types/parser";
+import { Parser, ParseOptions, ParseResult } from "../types/parser";
 import registry from "../configurations/registry";
 import { UseDeclarationService } from "./useDeclarationService";
 import { ModuleMatcherService } from "./moduleMatcherService";
 import { DefinitionEntryService } from "./definitionEntryService";
 import { SectionParser } from "./sectionParser";
 import { DiagramCodeLensService } from "./diagramCodeLensService";
-import { ConfigurationManager } from "../utils/config";
 
 /**
  * A Parser implementation that uses ModuleConfiguration configurations
@@ -41,8 +40,14 @@ export class ModuleParser implements Parser {
   /**
    * Parses the source code and returns a ParseResult.
    * @param source The source code to parse
+   * @param filePath The file path of the document (used for diagram CodeLenses)
+   * @param options Optional parse options, e.g. alternative declaration patterns
    */
-  parse(source: string, filePath?: string): ParseResult {
+  parse(
+    source: string,
+    filePath?: string,
+    options: ParseOptions = {}
+  ): ParseResult {
     const availableConfigs = registry.getAll();
     // Pass 1: Find all use declarations
     const useDeclarations =
@@ -55,16 +60,11 @@ export class ModuleParser implements Parser {
       };
     }
 
-    // Get alternative declaration patterns from configuration
-    const alternativePatterns = ConfigurationManager.getInstance().get(
-      "alternativeDeclarationPatterns"
-    );
-
     // Identify which modules are present
     const matchedModules = this.moduleMatcherService.identifyConfiguredModules(
       useDeclarations,
       availableConfigs,
-      alternativePatterns
+      options.alternativeDeclarationPatterns
     );
     if (matchedModules.length === 0) {
       return {

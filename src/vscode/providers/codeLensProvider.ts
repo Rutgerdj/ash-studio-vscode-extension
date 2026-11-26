@@ -10,11 +10,20 @@ class CodeLensProvider implements vscode.CodeLensProvider {
   // Track disposables for cleanup
   private disposables: vscode.Disposable[] = [];
 
+  // Fired to make VS Code re-request code lenses
+  private readonly _onDidChangeCodeLenses = new vscode.EventEmitter<void>();
+  readonly onDidChangeCodeLenses: vscode.Event<void> =
+    this._onDidChangeCodeLenses.event;
+
   constructor(private readonly parsedDataProvider: ParsedDataProvider) {
+    this.disposables.push(this._onDidChangeCodeLenses);
     // Listen for configuration changes that might affect code lens display
     this.disposables.push(
       vscode.workspace.onDidChangeConfiguration(event => {
-        if (event.affectsConfiguration("ashStudio.enableCodeLens")) {
+        if (
+          event.affectsConfiguration("ashStudio.enableCodeLens") ||
+          event.affectsConfiguration("ashStudio.alternativeDeclarationPatterns")
+        ) {
           this.triggerCodeLensRefresh();
         }
       })
@@ -65,7 +74,7 @@ class CodeLensProvider implements vscode.CodeLensProvider {
    */
   private triggerCodeLensRefresh(): void {
     // This will force VS Code to re-request code lenses
-    vscode.commands.executeCommand("vscode.executeCodeLensProvider");
+    this._onDidChangeCodeLenses.fire();
   }
 
   /**
@@ -92,7 +101,7 @@ export function registerCodeLensProvider(
     provider
   );
 
-  context.subscriptions.push(providerDisposable);
+  context.subscriptions.push(providerDisposable, provider);
 
   return vscode.Disposable.from(providerDisposable);
 }

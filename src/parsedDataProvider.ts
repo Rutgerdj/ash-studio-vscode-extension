@@ -3,6 +3,7 @@ import { ParseResult } from "./types/parser";
 import { moduleParser } from "./parser/moduleParser";
 import { Logger } from "./utils/logger";
 import { isElixirFile } from "./utils/fileUtils";
+import { ConfigurationManager } from "./utils/config";
 
 /**
  * ParsedDataProvider
@@ -73,8 +74,14 @@ export class ParsedDataProvider {
     let result: ParseResult;
 
     try {
+      const alternativeDeclarationPatterns =
+        ConfigurationManager.getInstance().get(
+          "alternativeDeclarationPatterns"
+        );
       // Pass file path to parser for diagram CodeLens support
-      result = moduleParser.parse(source, document.uri.fsPath);
+      result = moduleParser.parse(source, document.uri.fsPath, {
+        alternativeDeclarationPatterns,
+      });
       logger.debug("ParsedDataProvider", `Parser succeeded`, {
         sectionsFound: result.sections.length,
         diagramCodeLensesFound: result.diagramCodeLenses.length,
@@ -103,6 +110,14 @@ export class ParsedDataProvider {
   public clearCache(document: vscode.TextDocument): void {
     const uri = document.uri.toString();
     this.parseCache.delete(uri);
+  }
+
+  /**
+   * Clear the cache for all documents, e.g. when a setting that affects
+   * parsing has changed.
+   */
+  public clearAllCaches(): void {
+    this.parseCache.clear();
   }
 
   /**

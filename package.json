@@ -93,10 +93,20 @@
         "ashStudio.alternativeDeclarationPatterns": {
           "type": "object",
           "default": {},
-          "description": "Map alternative use declaration patterns to standard Ash patterns. For example: { \"App.Resource\": \"Ash.Resource\", \"App.Domain\": \"Ash.Domain\" } allows the extension to recognize custom macros that wrap Ash modules.",
+          "description": "Map alternative use declaration patterns to one or more standard Ash patterns, so custom macros that wrap Ash modules are recognized. Values can be a string or an array of strings. For example: { \"App.Domain\": \"Ash.Domain\", \"App.Resource\": [\"Ash.Resource\", \"AshPostgres.DataLayer\", \"AshGraphql.Resource\"] }. Use an array when the base macro sets the data layer or extensions itself, so they don't appear in the resource file.",
           "patternProperties": {
             ".*": {
-              "type": "string"
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              ]
             }
           }
         }

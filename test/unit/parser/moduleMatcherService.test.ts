@@ -199,5 +199,79 @@ describe("ModuleMatcherService", () => {
       expect(result).toHaveLength(1);
       expect(result[0].declarationPattern).toBe("Ash.Resource");
     });
+
+    it("should match multiple configs when an alternative pattern maps to an array", () => {
+      const service = new ModuleMatcherService();
+      const useDeclarations = ["use App.Resource"];
+      const alternativePatterns = {
+        "App.Resource": ["Ash.Resource", "AshGraphql.Resource"],
+      };
+      const result = service.identifyConfiguredModules(
+        useDeclarations,
+        mockConfigs,
+        alternativePatterns
+      );
+
+      expect(result.map(r => r.declarationPattern)).toEqual([
+        "Ash.Resource",
+        "AshGraphql.Resource",
+      ]);
+    });
+
+    it("should not add duplicates when array alternatives overlap with standard declarations", () => {
+      const service = new ModuleMatcherService();
+      const useDeclarations = [
+        "use App.Resource",
+        "use Ash.Resource",
+        "use AshGraphql.Resource",
+      ];
+      const alternativePatterns = {
+        "App.Resource": ["Ash.Resource", "AshGraphql.Resource", "Ash.Resource"],
+        "App.Other": "Ash.Resource",
+      };
+      const result = service.identifyConfiguredModules(
+        useDeclarations,
+        mockConfigs,
+        alternativePatterns
+      );
+
+      expect(result.map(r => r.declarationPattern)).toEqual([
+        "Ash.Resource",
+        "AshGraphql.Resource",
+      ]);
+    });
+
+    it("should support a mix of string and array values", () => {
+      const service = new ModuleMatcherService();
+      const useDeclarations = ["use App.Resource", "use App.Domain"];
+      const alternativePatterns = {
+        "App.Resource": ["Ash.Resource", "AshGraphql.Resource"],
+        "App.Domain": "Ash.Domain",
+      };
+      const result = service.identifyConfiguredModules(
+        useDeclarations,
+        mockConfigs,
+        alternativePatterns
+      );
+
+      expect(result.map(r => r.declarationPattern)).toEqual([
+        "Ash.Resource",
+        "AshGraphql.Resource",
+        "Ash.Domain",
+      ]);
+    });
+
+    it("should not throw and fall back to standard matching for invalid alternative patterns", () => {
+      const service = new ModuleMatcherService();
+      const useDeclarations = ["use Ash.Resource", "use App.Domain"];
+      for (const invalid of [null, [], 42, "Ash.Domain"]) {
+        const result = service.identifyConfiguredModules(
+          useDeclarations,
+          mockConfigs,
+          invalid as unknown as Record<string, string>
+        );
+        expect(result.map(r => r.declarationPattern)).toEqual(["Ash.Resource"]);
+      }
+    });
   });
 });
